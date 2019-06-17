@@ -1,0 +1,50 @@
+Resources:
+  myBoard:
+    Type: AWS::IoT::Thing
+    Properties:
+      ThingName: "notifhomeBoard"
+      AttributePayload: 
+        Attributes: 
+          vendor: ${self:custom.myNotifhome.board.vendor}
+          model: ${self:custom.myNotifhome.board.model}
+  iotPolicy:
+    Type: AWS::IoT::Policy
+    Properties:
+      PolicyDocument:
+        Version: ${self:custom.policyVersion}
+        Statement: # https://docs.aws.amazon.com/iot/latest/developerguide/pub-sub-policy.html
+          - 
+            Effect: "Allow"
+            Action: "iot:Receive"
+            Resource: 
+              - "arn:aws:iot:${self:provider.region}:#{AWS::AccountId}:topic/${self:custom.topic}"
+          - 
+            Effect: "Allow"
+            Action: "iot:Connect"
+            Resource: 
+              - "arn:aws:iot:${self:provider.region}:#{AWS::AccountId}:client/*"
+          - 
+            Effect: "Allow"
+            Action: "iot:Subscribe"
+            Resource: 
+              - "arn:aws:iot:${self:provider.region}:#{AWS::AccountId}:topicfilter/${self:custom.topic}"
+      PolicyName: "notifhomePolicy"
+  myBoardCert:
+    Type: AWS::IoT::Certificate
+    Properties: 
+      CertificateSigningRequest: ${self:custom.myNotifhome.board.csr}
+      Status: "ACTIVE"
+  myBoardPrincipalAttachment: 
+    Type: AWS::IoT::ThingPrincipalAttachment
+    Properties: 
+      ThingName: 
+        Ref: "myBoard"
+      Principal: 
+        Fn::GetAtt: [ myBoardCert, Arn ]
+  iotPolicyPrincipalAttachment:
+    Type: AWS::IoT::PolicyPrincipalAttachment
+    Properties: 
+      PolicyName: 
+        Ref: "iotPolicy"
+      Principal: 
+        Fn::GetAtt: [ myBoardCert, Arn ]

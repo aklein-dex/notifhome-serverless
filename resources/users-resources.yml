@@ -1,0 +1,34 @@
+Resources:
+  user1:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: ${self:custom.myNotifhome.users.username1}
+  user2:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: ${self:custom.myNotifhome.users.username2}
+  usersGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "usersGroup"
+      Path: "/notifhome/"
+  addToUsersGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties: 
+      GroupName: !Ref "usersGroup"
+      Users: 
+        - !Ref "user1"
+        - !Ref "user2"
+  usersPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "usersPolicy"
+      PolicyDocument:
+        Version: ${self:custom.policyVersion}
+        Statement:
+          - 
+            Effect: "Allow"
+            Action: "execute-api:Invoke"
+            Resource: "arn:aws:execute-api:${self:provider.region}:#{AWS::AccountId}:*/dev/POST/notifications"
+      Groups:
+        - Ref: "usersGroup"

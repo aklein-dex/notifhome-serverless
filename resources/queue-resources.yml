@@ -1,0 +1,5 @@
+Resources:
+  myqueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: ${self:custom.queueName}
