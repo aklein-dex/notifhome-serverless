@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body class="logged-in env-production emoji-size-boost min-width-lg">
+    <script src="my-aws-credentials.js"></script> 
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="apiGateway-js-sdk/apigClient.js"></script>
+    <h1>Notifhome</h1>
+
+    <form action="#" onsubmit="return submitMessage(event);">
+      Message:<br>
+      <input type="text" id="message" name="message">
+      <br><br>
+      <input type="submit" value="Submit">
+    </form>
+
+    <br>
+    <br>
+
+    <div id="result"></div>
+
+    <script>
+      function submitMessage(e) {
+        e.preventDefault();
+        var message = document.getElementById('message').value;
+
+        if(message === '')
+          return false;
+        
+        var apigClient = apigClientFactory.newClient({ // Mettre les valeurs suivants dans un fichier de .js.tpl !!!!!
+          accessKey: AWS_ACCESS_KEY,
+          secretKey: AWS_SECRET_KEY,
+          region: AWS_REGION,
+        });
+
+        var body = {
+          message: message
+        };
+
+        apigClient.notificationsPost({}, body, {})
+          .then(function(result) {
+            console.log('Yay!');
+            document.getElementById('result').innerHTML = 'yay!';
+            document.getElementById('message').value = '';
+          }).catch( function(result) {
+            // There is a CORS error because there is no web server serving this page. We can ignore it for now.
+            console.log(JSON.stringify(result));
+            document.getElementById('result').innerHTML = JSON.stringify(result);
+            document.getElementById('message').value = '';
+          });
+        return false;
+      }
+    </script>
+  </body>
+  </html>
