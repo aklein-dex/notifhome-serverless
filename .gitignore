@@ -9,6 +9,11 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+/aws/*.csr
+/aws/*.key
+/aws/*.crt
+/client/my-aws-credentials.js
+
 
 # Used by dotenv library to load environment variables.
 # .env
